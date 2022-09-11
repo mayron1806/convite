@@ -3,11 +3,10 @@ import useAuth from "./Hooks/useAuth";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import PageProtector from "./pages/PageProtector";
-
 function App() {
   const { fetchingUser } = useAuth();
   return (
-    <>
+    <div style={{height: `${window.innerHeight}px`}}>
       {
         !fetchingUser &&
         <BrowserRouter>
@@ -19,7 +18,7 @@ function App() {
         ||
         <p>Carregando...</p>
       }
-    </>
+    </div>
   );
 }
 

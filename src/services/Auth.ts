@@ -9,7 +9,7 @@ export const getCurrentUser = () => {
       const user : User = {
         uid: currentUser.uid,
         displayName: currentUser.displayName,
-        photoURL: currentUser.photoURL
+        photoURL: currentUser.photoURL,
       } 
       return user;
     }

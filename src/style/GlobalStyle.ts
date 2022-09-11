@@ -15,4 +15,8 @@ export const GlobalStyle = createGlobalStyle`
     --white: #F5F5F5;
     --purple: #D00F83;
   }
+  html{
+    font-family: 'Poppins', sans-serif;
+    font-size: 62.5%;
+  }
 `;
