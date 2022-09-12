@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import Title from "../Title";
+import Logo from "../Logo";
+
 const Container = styled.div`
   display: flex;
   gap: 1rem;
@@ -24,7 +25,7 @@ type props = {
 const Header = ({children, contentStyle}: props) => {
   return(
     <Container>
-      <Title />
+      <Logo />
       <Content style={contentStyle}>
         {children}
       </Content>

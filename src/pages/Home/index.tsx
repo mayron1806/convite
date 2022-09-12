@@ -3,20 +3,27 @@ import useAuth from "../../Hooks/useAuth";
 import Button from "../../UI/Button";
 import Header from "../../UI/Header";
 import * as C from "./style";
-import {ImExit} from 'react-icons/im';
 import {GrAddCircle} from 'react-icons/gr';
 import Footer from "../../UI/Footer";
 import useParty from "../../Hooks/useParty";
 import { useEffect, useState } from "react";
 import Party from "../../Types/Party";
+import Modal from "../../UI/Modal";
 
 const Home = () => {
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
   const { getAllParties } = useParty();
-  const navigate = useNavigate();
+
+  // parties
   const [parties, setParties] = useState<Party[]>([]);
   const [loadingParties, setLoadingParties] = useState<boolean>(false);
   
+  // modal
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  const openModal = ()=> setModalIsOpen(true);
+  const closeModal = ()=> setModalIsOpen(false);
+  
+  // initial requests
   useEffect(()=> {
     if(user){
       setLoadingParties(true);
@@ -27,55 +34,62 @@ const Home = () => {
     }
   }, [])
 
-  const exit = () => {
-    logout();
-    navigate('/login');
-  }
-
   return(
     <C.Container>
-      <Header>
-        <C.SubTitle>Suas festas</C.SubTitle>
-        <div>
-          <Button 
-            backgroundColor="purple" 
-            style={{color: 'var(--white)', fontSize: '1.6rem'}}
-          >
-            <>
-              Criar festa
-              <GrAddCircle fontSize='2rem'/>
-            </>
-          </Button>
-        </div>
-      </Header>
-      <C.Main>
-        <C.Table>
-          <thead>
-            <tr>
-              <th style={{textAlign: 'left'}}>Nome</th>
-              <th>Dia da festa</th>
-            </tr>
-          </thead>
-          <tbody>
-            {parties.map(party=> (
-              <PartyItem key={party.name}  date={party.date} name={party.name}/>
-            ))}
-          </tbody>
-        </C.Table>
-      </C.Main>
-      <Footer>
-        <C.SubTitle>
-          {user?.displayName}
-        </C.SubTitle>
-        <div>
-          <Button backgroundColor="black" action={exit}>
-            <ImExit fontSize='2rem'/>
-          </Button>
-        </div>
-      </Footer>
+      <Head openModal={openModal}/>
+      <Main parties={parties}/>
+      <Footer />
+      {
+        modalIsOpen &&
+        <Modal title="Criar festa" closeModal={closeModal}>
+          <div>
+            <p>tese</p>
+          </div>
+        </Modal>
+      }
     </C.Container>
   )
 }
+
+// HEADER ================================================================
+const Head = ({ openModal }: {openModal: ()=> void}) => {
+  return(
+    <Header>
+      <C.SubTitle>Suas festas</C.SubTitle>
+      <div>
+        <Button 
+          backgroundColor="purple" 
+          style={{color: 'var(--white)', fontSize: '1.6rem'}}
+          action={openModal}
+        ><>Criar festa <GrAddCircle fontSize='2rem'/></>
+        </Button>
+      </div>
+    </Header>
+  )
+}
+
+// MAIN ==================================================================
+const Main = ({parties}: {parties: Party[]}) => {
+  return(
+    <C.Main>
+      <C.Table>
+        <thead>
+          <tr>
+            <th style={{textAlign: 'left'}}>Nome</th>
+            <th>Dia da festa</th>
+          </tr>
+        </thead>
+        <tbody>
+          {parties.map(party=> (
+            <PartyItem key={party.name}  date={party.date} name={party.name}/>
+          ))}
+        </tbody>
+      </C.Table>
+    </C.Main>
+  )
+}
+
+// PARTY ITEM ============================================================
 type PartyItemProps = {
   name: string,
   date: Date

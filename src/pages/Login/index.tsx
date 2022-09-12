@@ -3,7 +3,7 @@ import { firebaseAuthProviders } from "../../context/AuthContext";
 import useAuth from "../../Hooks/useAuth";
 import Button from "../../UI/Button";
 import Paragraph from "../../UI/Paragraph";
-import Title from "../../UI/Title";
+import Logo from "../../UI/Logo";
 import * as C from './style';
 import bg from '../../assets/imgs/party.png';
 
@@ -24,7 +24,7 @@ const Login = () => {
         <img src={bg} alt="" />
       </C.Background>
       <C.Main>
-        <Title />
+        <Logo />
         <Paragraph color="white">
           Convide seus amigos para sua festa de uma forma digital.
         </Paragraph>
