@@ -14,6 +14,7 @@ export const GlobalStyle = createGlobalStyle`
     --black: #2F2F2F;
     --white: #F5F5F5;
     --purple: #D00F83;
+    --shadow: 0px 0px 15px rgba(0,0,0, 0.6);
   }
   html{
     font-family: 'Poppins', sans-serif;

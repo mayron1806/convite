@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { firebaseAuthProviders } from "../../context/AuthContext";
 import useAuth from "../../Hooks/useAuth";
-import Button from "../../UI/single-component/Button";
-import Paragraph from "../../UI/single-component/Paragraph";
-import Title from "../../UI/single-component/Title";
+import Button from "../../UI/Button";
+import Paragraph from "../../UI/Paragraph";
+import Title from "../../UI/Title";
 import * as C from './style';
 import bg from '../../assets/imgs/party.png';
 

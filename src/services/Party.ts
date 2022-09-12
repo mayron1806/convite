@@ -1,16 +1,27 @@
-import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, Timestamp, where } from "firebase/firestore";
 import Party from "../Types/Party";
 import User from "../Types/User";
 import {firestore as db} from "./firebase";
-export const getParties = async (user: User) => {
+export const getPartiesByUser = async (user: User) => {
   try{
+    const q = query(collection(db, 'parties'), where('ownerID', '==', user.uid));
+    const querySnapshot = await getDocs(q);
+    const parties: Party[] = [];
+    querySnapshot.forEach(doc => {
+      const party = doc.data() as Party;
+      const timestamp = doc.data().date as Timestamp;
 
+      party.date = new Date(timestamp.toDate());
+      
+      parties.push(party);
+    })
+    return parties; 
   }
   catch(e){
     throw new Error((e as Error).message);
   }
 }
-export const getParty = async (partyID:string) => {
+export const getPartyByID = async (partyID: string) => {
   try{
     const party = await getDoc(doc(db, 'parties', partyID));
     if(!party.exists()){
@@ -22,26 +33,9 @@ export const getParty = async (partyID:string) => {
     throw new Error((e as Error).message);
   }
 }
-export const createParty = async (user: User, party: Party) => {
+export const createParty = async (party: Party) => {
   try{
-    // CRIA PARTY
-    const partyRef = await addDoc(collection(db, 'parties'), party);
-    
-    // ADICIONA USUARIO
-    const partyID = partyRef.id;
-
-    // pega a lista de festa do usuario no banco de dados
-    const user_db = await getDoc(doc(db, 'users', user.uid));
-
-    // adiciona festa a lista de festas do usuario
-    let user_parties: string[] = [];
-    if(user_db.exists()){
-      user_parties = user_db.data().parties;
-    }
-    user_parties.push(partyID);
-
-    // salva usuario
-    await setDoc(doc(db, 'users', user.uid), {parties: user_parties});
+    await addDoc(collection(db, 'parties'), party);
   }
   catch(e){
     throw new Error((e as Error).message);

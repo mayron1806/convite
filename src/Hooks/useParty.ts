@@ -1,18 +1,13 @@
-import { useContext } from "react";
-import { PartyContext } from "../context/PartyContext";
-import { getParty } from "../services/Party";
+import { getPartiesByUser, getPartyByID } from "../services/Party";
+import User from "../Types/User";
 
 const useParty = ()=>{
-  const party = useContext(PartyContext);
-  const selectParty = (partyID: string) => {
-    getParty(partyID)
-    .then(res=> {
-      party.setParty(res);
-    })
-    .catch(e=>{
-      console.log(e);
-    })
+  const getParty = async (partyID: string) => {
+    return await getPartyByID(partyID);
   }
-  return {getParty: party.party, selectParty};
+  const getAllParties = async (user: User) => {
+    return await getPartiesByUser(user)
+  }
+  return {selectParty: getParty, getAllParties};
 }
 export default useParty;
