@@ -6,9 +6,12 @@ import * as C from "./style";
 import {GrAddCircle} from 'react-icons/gr';
 import Footer from "../../UI/Footer";
 import useParty from "../../Hooks/useParty";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Party from "../../Types/Party";
 import Modal from "../../UI/Modal";
+import { addDoc, collection, doc, getDoc, getDocs, query } from "firebase/firestore";
+import { firestore } from "../../services/firebase";
+import Participant from "../../Types/Participant";
 
 const Home = () => {
   const { user } = useAuth();
@@ -42,9 +45,7 @@ const Home = () => {
       {
         modalIsOpen &&
         <Modal title="Criar festa" closeModal={closeModal}>
-          <div>
-            <p>tese</p>
-          </div>
+          <CreateParty />
         </Modal>
       }
     </C.Container>
@@ -107,6 +108,42 @@ const PartyItem = ({name, date}: PartyItemProps) => {
       <td>{name}</td>
       <td style={{textAlign: 'center'}}>{dateFormated()}</td>
     </C.TableItem>
+  )
+}
+const CreateParty = () => {
+  const { createParty } = useParty();
+  const { user } = useAuth();
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const dateRef = useRef<HTMLInputElement | null>(null);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if(nameRef && nameRef.current){
+      if(dateRef && dateRef.current){
+        if(!user) return;
+        const newParty: Party = {
+          name: nameRef.current.value,
+          date: dateRef.current.valueAsDate || new Date(),
+          ownerID: user.uid
+        }
+        createParty(newParty);
+      }
+    }
+  }
+  return(
+    <form onSubmit={handleSubmit}>
+      <input 
+        type="text" 
+        placeholder="Nome" 
+        ref={nameRef}
+      />
+      <input 
+        type="date" 
+        placeholder="Data da festa" 
+        ref={dateRef}
+      />
+      <input type="submit" value="Criar" />
+    </form>
   )
 }
 export default Home;

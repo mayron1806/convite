@@ -1,4 +1,5 @@
 import { addDoc, collection, doc, getDoc, getDocs, query, Timestamp, where } from "firebase/firestore";
+import Participant from "../Types/Participant";
 import Party from "../Types/Party";
 import User from "../Types/User";
 import {firestore as db} from "./firebase";
@@ -33,9 +34,16 @@ export const getPartyByID = async (partyID: string) => {
     throw new Error((e as Error).message);
   }
 }
-export const createParty = async (party: Party) => {
+export const createParty = async (party: Party, participants?: Participant[]) => {
   try{
-    await addDoc(collection(db, 'parties'), party);
+    const partyRef = await addDoc(collection(db, 'parties'), party);
+    // adiciona participantes
+    if(participants){
+      const partyID = partyRef.id;
+      participants.forEach(async participant => {
+        await addDoc(collection(db,'parties', partyID, 'participants'), participant);
+      })
+    }
   }
   catch(e){
     throw new Error((e as Error).message);
