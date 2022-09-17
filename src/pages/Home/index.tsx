@@ -12,6 +12,9 @@ import Modal from "../../UI/Modal";
 import { addDoc, collection, doc, getDoc, getDocs, query } from "firebase/firestore";
 import { firestore } from "../../services/firebase";
 import Participant from "../../Types/Participant";
+import { validatePartyDate, validatePartyName } from "../../Utils/Validation";
+import { MAX_PARTY_NAME_SIZE } from "../../config/Party";
+import { partyValidation } from "../../services/Party";
 
 const Home = () => {
   const { user } = useAuth();
@@ -110,25 +113,61 @@ const PartyItem = ({name, date}: PartyItemProps) => {
     </C.TableItem>
   )
 }
+type messageTypes = 'ERROR' | 'SUCCESS' | 'LOADING';
+type message = {
+  message: string,
+  stats: messageTypes
+}
 const CreateParty = () => {
+  const navigate = useNavigate();
   const { createParty } = useParty();
   const { user } = useAuth();
   const nameRef = useRef<HTMLInputElement | null>(null);
   const dateRef = useRef<HTMLInputElement | null>(null);
 
+  const [status, setStatus] = useState<message>({message: '', stats: "ERROR"});
+  const [loading, setLoading] = useState<boolean>(false);
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if(nameRef && nameRef.current){
-      if(dateRef && dateRef.current){
-        if(!user) return;
-        const newParty: Party = {
-          name: nameRef.current.value,
-          date: dateRef.current.valueAsDate || new Date(),
-          ownerID: user.uid
-        }
-        createParty(newParty);
-      }
+
+    if(!user) return navigate('/login');
+    
+    // valida formulario
+    if(!nameRef || !nameRef.current || !dateRef || !dateRef.current){
+      setStatus({
+        message: 'Erro no formulário, tente recarregar a pagina.',
+        stats: "ERROR"
+      })
+      return;
     }
+    if(!dateRef.current.valueAsDate){
+      setStatus({
+        message: 'Data invalida.',
+        stats: "ERROR"
+      })
+      return;
+    }
+
+    const partyModel: Party = {
+      date: dateRef.current.valueAsDate,
+      name: nameRef.current.value,
+      ownerID: user.uid
+    }
+    setLoading(true);
+    partyValidation(partyModel)
+    .then(()=>{
+      createParty(partyModel);
+    })
+    .catch(e => {
+      const errorMessage = (e as Error).message;
+      setStatus({
+        message: errorMessage,
+        stats: "ERROR"
+      })
+    })
+    .finally(()=>{
+      setLoading(false);
+    })
   }
   return(
     <form onSubmit={handleSubmit}>
@@ -142,6 +181,14 @@ const CreateParty = () => {
         placeholder="Data da festa" 
         ref={dateRef}
       />
+      {
+        loading &&
+        <p>carregando...</p>
+      }
+      {
+        status.message.length > 0 &&
+        <p>{status.message}</p>
+      }
       <input type="submit" value="Criar" />
     </form>
   )
