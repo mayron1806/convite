@@ -1,4 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import Party from "../../../../Types/Party"
+import { dateFormated } from "../../../../Utils/Date";
 import * as C from './style';
 const Main = ({parties}: {parties: Party[]}) => {
   return(
@@ -12,7 +14,7 @@ const Main = ({parties}: {parties: Party[]}) => {
         </thead>
         <tbody>
           {parties.map(party=> (
-            <PartyItem key={party.name}  date={party.date} name={party.name}/>
+            <PartyItem key={party.name} date={party.date} name={party.name}/>
           ))}
         </tbody>
       </C.Table>
@@ -26,17 +28,11 @@ type PartyItemProps = {
   date: Date
 }
 const PartyItem = ({name, date}: PartyItemProps) => {
-  const dateFormated = () => {
-    const day = ('00' + date.getDate()).slice(-2);
-    const month = ('00' + (date.getMonth() + 1)).slice(-2);
-    const year = date.getFullYear();
-    
-    return `${day}/${month}/${year}`;
-  }
+  const navigate = useNavigate();
   return (
-    <C.TableItem>
+    <C.TableItem onClick={()=> navigate(`/party/${name}`)}>
       <td>{name}</td>
-      <td style={{textAlign: 'center'}}>{dateFormated()}</td>
+      <td style={{textAlign: 'center'}}>{dateFormated(date)}</td>
     </C.TableItem>
   )
 }

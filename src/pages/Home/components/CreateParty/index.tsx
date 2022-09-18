@@ -1,12 +1,10 @@
-import { useRef, useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../../../Hooks/useAuth";
-import useParty from "../../../../Hooks/useParty";
-import { partyValidation } from "../../../../services/Party";
-import Party from "../../../../Types/Party";
+import { createParty, partyValidation } from "../../../../services/Party";
 import Modal from "../../../../UI/Modal";
-
-type messageTypes = 'ERROR' | 'SUCCESS' | 'LOADING';
+import * as C from "./style";
+export type messageTypes = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';
 type message = {
   message: string,
   stats: messageTypes
@@ -16,73 +14,55 @@ type props = {
 }
 const CreateParty = ({ closeModal }: props) => {
   const navigate = useNavigate();
-  const { createParty } = useParty();
   const { user } = useAuth();
-  const nameRef = useRef<HTMLInputElement | null>(null);
-  const dateRef = useRef<HTMLInputElement | null>(null);
 
-  const [status, setStatus] = useState<message>({message: '', stats: "ERROR"});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [status, setStatus] = useState<message>({message: '', stats: "NONE"});
   
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-
     if(!user) return navigate('/login');
-    
-    // valida formulario
-    if(!nameRef || !nameRef.current || !dateRef || !dateRef.current){
-      setStatus({
-        message: 'Erro no formulário, tente recarregar a pagina.',
-        stats: "ERROR"
+
+    const data = new FormData(e.target as HTMLFormElement);
+    const name = data.get("name") as string;
+    const date = new Date(data.get('date') as string);
+    date.setHours(date.getHours() + (date.getTimezoneOffset() / 60));
+
+    setStatus({stats: 'LOADING', message: 'Validando'});
+    partyValidation(name, date, user.uid)
+    .then(() => {
+      setStatus({stats: 'LOADING', message: 'Criando festa'});
+      // cria festa
+      createParty(name, date, user.uid, [])
+      .then(()=> {
+        setStatus({stats: 'SUCCESS', message: 'Festa criada com sucesso!'});
       })
-      return;
-    }
-    if(!dateRef.current.valueAsDate){
-      setStatus({
-        message: 'Data invalida.',
-        stats: "ERROR"
-      })
-      return;
-    }
-    const partyModel: Party = {
-      date: dateRef.current.valueAsDate,
-      name: nameRef.current.value,
-      ownerID: user.uid
-    }
-    setLoading(true);
-    partyValidation(partyModel)
-    .then(() => createParty(partyModel))
-    .catch(e => {
-      setStatus({
-        message: (e as Error).message,
-        stats: "ERROR"
+      .catch(e => {
+        setStatus({message: (e as Error).message, stats: "ERROR"});
       })
     })
-    .finally(()=> setLoading(false));
+    .catch(e => {
+      setStatus({message: (e as Error).message, stats: "ERROR"});
+    })
   }
   return(
     <Modal title="Criar festa" closeModal={closeModal}>
-      <form onSubmit={handleSubmit}>
-        <input 
+      <C.Form onSubmit={handleSubmit}>
+        <C.Input  
           type="text" 
           placeholder="Nome" 
-          ref={nameRef}
+          name='name'
         />
-        <input 
+        <C.Input 
           type="date" 
           placeholder="Data da festa" 
-          ref={dateRef}
+          name='date'
         />
         {
-          loading &&
-          <p>carregando...  </p>
+          status.message.length > 0 && status.stats !== 'NONE' &&
+          <C.Message stats={status.stats}>{status.message}</C.Message>
         }
-        {
-          status.message.length > 0 &&
-          <p>{status.message}</p>
-        }
-        <input type="submit" value="Criar" />
-      </form>
+        <C.Submit value="Criar" />
+      </C.Form>
     </Modal>
   )
 }

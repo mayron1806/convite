@@ -3,6 +3,7 @@ import useAuth from "./Hooks/useAuth";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import PageProtector from "./pages/PageProtector";
+import Party from "./pages/Party";
 function App() {
   const { fetchingUser } = useAuth();
   return (
@@ -13,6 +14,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<PageProtector require_auth={false}><Login /></PageProtector>}/>
             <Route path="/" element={<PageProtector><Home /></PageProtector>}/>
+            <Route path="/party/:name" element={<PageProtector><Party /></PageProtector>}/>
           </Routes>
         </BrowserRouter>
         ||

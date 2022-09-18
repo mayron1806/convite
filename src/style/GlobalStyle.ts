@@ -8,6 +8,7 @@ export const GlobalStyle = createGlobalStyle`
     border: 0;
     box-sizing: border-box;
     text-decoration: none;
+    outline: none;
   }
   :root{
     // cores
@@ -15,6 +16,8 @@ export const GlobalStyle = createGlobalStyle`
     --white: #F5F5F5;
     --purple: #D00F83;
     --shadow: 0px 0px 15px rgba(0,0,0, 0.6);
+    --red: #FF2F2B;
+    --green: #46FF30;
   }
   html{
     font-family: 'Poppins', sans-serif;

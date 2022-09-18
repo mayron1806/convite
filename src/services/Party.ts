@@ -2,20 +2,23 @@ import { addDoc, collection, doc, getDoc, getDocs, query, Timestamp, where } fro
 import { MAX_PARTY_NAME_SIZE, MIN_PARTY_NAME_SIZE } from "../config/Party";
 import Participant from "../Types/Participant";
 import Party from "../Types/Party";
-import User from "../Types/User";
 import {firestore as db} from "./firebase";
 
-
-export const getPartiesByUser = async (user: User) => {
+export const getPartiesByUser = async (userID: string) => {
   try{
-    const q = query(collection(db, 'parties'), where('ownerID', '==', user.uid));
+    const q = query(collection(db, 'parties'), where('ownerID', '==', userID));
     const querySnapshot = await getDocs(q);
     const parties: Party[] = [];
     querySnapshot.forEach(doc => {
-      const party = doc.data() as Party;
       const timestamp = doc.data().date as Timestamp;
+      const date = new Date(timestamp.toDate());
 
-      party.date = new Date(timestamp.toDate());
+      const party: Party = {
+        name : doc.data().name,
+        date,
+        ownerID: doc.data().ownerID,
+        id: doc.id
+      };
       
       parties.push(party);
     })
@@ -37,9 +40,9 @@ export const getPartyByID = async (partyID: string) => {
     throw new Error((e as Error).message);
   }
 }
-export const createParty = async (party: Party, participants?: Participant[]) => {
+export const createParty = async (name: string, date: Date, ownerID: string, participants?: Participant[]) => {
   try{
-    const partyRef = await addDoc(collection(db, 'parties'), party);
+    const partyRef = await addDoc(collection(db, 'parties'), {name, date, ownerID});
     // adiciona participantes
     if(participants){
       const partyID = partyRef.id;
@@ -62,19 +65,22 @@ const nameIsUsed = async (partyName: string, userID: string) => {
     throw new Error((e as Error).message);
   }
 }
-export const partyValidation = async (partyToValidate: Party) => {
+export const partyValidation = async (name: string, date: Date, ownerID: string) => {
   // valida data
-  if(partyToValidate.date < new Date()){
+  if(!date){
+    throw new Error("Data invalida.");
+  }
+  if(date < new Date()){
     throw new Error("Você não pode fazer uma festa para uma data que já passou.");
   }
   // valida nome
-  const name = partyToValidate.name.trim();
+  name = name.trim();
   const minSize = MIN_PARTY_NAME_SIZE;
   const maxSize = MAX_PARTY_NAME_SIZE;
   if(name.length > maxSize || name.length < minSize){
     throw new Error(`O nome da festa deve ter entre ${minSize} e ${maxSize} caracteres.`);
   }
-  const isUsed = await nameIsUsed(name, partyToValidate.ownerID);
+  const isUsed = await nameIsUsed(name, ownerID);
   if(isUsed){
     throw new Error("O nome já está em uso.");
   }

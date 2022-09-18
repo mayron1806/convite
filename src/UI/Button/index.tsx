@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const Container = styled.button<{backgroundColor?: 'white' | 'black' | 'purple'}>`
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   background-color: var(--${props => props.backgroundColor ? props.backgroundColor : 'white'});
   display: flex;
   justify-content: center;
