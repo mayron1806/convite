@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, query, Timestamp, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, Timestamp, where, limit } from "firebase/firestore";
 import { MAX_PARTY_NAME_SIZE, MIN_PARTY_NAME_SIZE } from "../config/Party";
 import Participant from "../Types/Participant";
 import Party from "../Types/Party";
@@ -27,6 +27,16 @@ export const getPartiesByUser = async (userID: string) => {
   catch(e){
     throw new Error((e as Error).message);
   }
+}
+export const getPartyID = async (partyName: string, userID: string)=>{
+  const q = query(
+    collection(db, 'parties'), 
+    where('ownerID', '==', userID), 
+    where('name', '==', partyName), 
+    limit(1)
+  );
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs[0].id;
 }
 export const getPartyByID = async (partyID: string) => {
   try{

@@ -7,7 +7,8 @@ import Participant from '../../../../Types/Participant';
 import Button from '../../../../UI/Button';
 import ParticipantItem from '../ParticipantItem';
 import * as C from './style';
-const Content = () => {
+
+const Content = ({ partyID }: {partyID: string}) => {
   const {user} = useAuth();
   const { name } = useParams();
 
@@ -23,7 +24,7 @@ const Content = () => {
       return;
     }
     setLoading(true);
-    GetParticipants(name, user.uid)
+    GetParticipants(partyID)
     .then(res => {
       setParticipants(res);
       console.log(res);
@@ -33,28 +34,19 @@ const Content = () => {
   }, []);
 
   // renderiza os participantes
-  const render = () => {
+  const content = () => {
+    const renderParticipant = (p: Participant) => (
+      <ParticipantItem participant={p} key={p.id}/>
+    )
     if(presentParticipants.length == 0){
-      return (
-        absentParticipants.map(p => (
-          <ParticipantItem participant={p} key={p.name}/>
-        ))
-      );
+      return absentParticipants.map(renderParticipant);
     }
     return (
       <>
         <C.SubTitle>A chegar</C.SubTitle>
-        {
-          absentParticipants.map(p => (
-            <ParticipantItem participant={p} key={p.name}/>
-          ))
-        }
+        { absentParticipants.map(renderParticipant) }
         <C.SubTitle>Presentes</C.SubTitle>
-        {
-          presentParticipants.map(p=> (
-            <ParticipantItem participant={p} key={p.name}/>
-          ))
-        }
+        { presentParticipants.map(renderParticipant) }
       </>
     )
   }
@@ -62,8 +54,10 @@ const Content = () => {
     <C.Container>
       <ContentHead />
       {
-        !loading &&
-        render()
+        loading &&
+        <p>Aguarde estamos buscando seus convidados</p>
+        ||
+        content()
       }
     </C.Container>
   )
