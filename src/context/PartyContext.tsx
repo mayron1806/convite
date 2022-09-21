@@ -1,23 +1,34 @@
-import React, { createContext, useState } from "react";
-import Party from "../Types/Party";
+import { createContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import useAuth from "../Hooks/useAuth";
+import { getPartyID } from "../services/Party";
 
 
 type PartyContextProps = {
-  party: Party| null,
-  setParty: React.Dispatch<React.SetStateAction<Party | null>>,
-  parties: Party[] | null,
-  setParties: React.Dispatch<React.SetStateAction<Party[] | null>>,
-  loading: boolean,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  partyID: string | null,
+  loading: boolean
 }
 export const PartyContext = createContext<PartyContextProps>({} as PartyContextProps);
 
 export const PartyProvider = ({children}: {children: JSX.Element}) => {
-  const [party, setParty] = useState<Party | null>(null);
-  const [parties, setParties] = useState<Party[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [partyID, setPartyID] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const {user} = useAuth();
+  const {name} = useParams();
+  
+  // pega o id da festa pelo nome e pelo usuario
+  useEffect(()=> {
+    if(!name || !user) return;
+
+    setLoading(true);
+    getPartyID(name, user.uid)
+    .then(res=> setPartyID(res))
+    .catch(e => console.log(e))
+    .finally(()=> setLoading(false))
+  }, [user, name]);
+
   return (
-    <PartyContext.Provider value={{party, setParty, loading, setLoading, parties, setParties}}>
+    <PartyContext.Provider value={{partyID, loading}}>
       {children}
     </PartyContext.Provider>
   )

@@ -30,7 +30,7 @@ export const getPartiesByUser = async (userID: string) => {
 }
 export const getPartyID = async (partyName: string, userID: string)=>{
   const q = query(
-    collection(db, 'parties'), 
+    collection(db, 'parties'),
     where('ownerID', '==', userID), 
     where('name', '==', partyName), 
     limit(1)

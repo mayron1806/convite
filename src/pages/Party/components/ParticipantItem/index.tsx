@@ -1,26 +1,59 @@
-import { MdOutlineQrCode2 } from "react-icons/md";
-import styled from "styled-components";
+import { useState } from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import useParty from "../../../../Hooks/useParty";
+import { DeleteParticipant, UpdateState } from "../../../../services/Participants";
 import Participant from "../../../../Types/Participant";
+import Button from "../../../../UI/Button";
+import * as C from './style';
 
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--white);
-  font-size: 1.6rem;
-  padding: .5rem;
-  padding-left: 0;
-  color: var(--white);
-  svg{
-    font-size: 2rem;
-  }
-`;
 const ParticipantItem = ({participant}: {participant: Participant}) => {
+  const { partyID } = useParty();
   return(
-    <Container>
+    <C.Container>
       {participant.name}
-      <MdOutlineQrCode2 />
-    </Container>
+      <More participant={participant} partyID={partyID || ''}/>
+    </C.Container>
   );
+}
+type props = {
+  participant: Participant,
+  partyID: string
+}
+const More = ({participant, partyID}: props) => {
+  const [active, setActive] = useState<boolean>(false);
+
+  const deleteParticipant = () => {
+    DeleteParticipant(partyID, participant.id)
+    .catch(e => console.log(e))
+  }
+  const changePresent = (present: boolean) => {
+    UpdateState(partyID, participant.id, present)
+    .catch(e => console.log(e))
+  }
+  return(
+    <C.More>
+      <BsThreeDotsVertical onClick={()=> setActive(a => !a)}/>
+      <C.Options isActive={active}>
+        <Button 
+          backgroundColor="black" style={{color: 'var(--white)'}}
+          action={()=> changePresent(!participant.present)}
+        >
+          {participant.present ? 'Desmarcar presença' : 'Marcar presença'}
+        </Button>
+        <Button 
+          backgroundColor="black" style={{color: 'var(--white)'}}
+        >
+          QR Code
+        </Button>
+        <Button 
+          style={{color: 'var(--white)', backgroundColor: 'var(--red)'}}
+          action={deleteParticipant}
+        >
+          Excluir
+        </Button>
+      </C.Options>
+    </C.More>
+
+  )
 }
 export default ParticipantItem;
