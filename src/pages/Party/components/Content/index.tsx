@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { IoIosAddCircleOutline } from 'react-icons/io';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../../../Hooks/useAuth';
+import useParty from '../../../../Hooks/useParty';
 import { GetParticipants } from '../../../../services/Participants';
 import Participant from '../../../../Types/Participant';
 import Button from '../../../../UI/Button';
 import ParticipantItem from '../ParticipantItem';
 import * as C from './style';
 
-const Content = ({ partyID }: {partyID: string}) => {
-  const {user} = useAuth();
-  const { name } = useParams();
+const Content = () => {
+  const { partyID, loading: partyLoading } = useParty();
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -20,18 +20,16 @@ const Content = ({ partyID }: {partyID: string}) => {
 
   // pega participantes da sala
   useEffect(()=> {
-    if(!user || !name){
-      return;
+    if(!partyLoading && partyID){
+      setLoading(true);
+      GetParticipants(partyID)
+      .then(res => {
+        setParticipants(res)
+      })
+      .catch(e=>console.log(e))
+      .finally(()=> setLoading(false));
     }
-    setLoading(true);
-    GetParticipants(partyID)
-    .then(res => {
-      setParticipants(res);
-      console.log(res);
-    })
-    .catch(e=>console.log(e))
-    .finally(()=> setLoading(false));
-  }, []);
+  }, [partyLoading, partyID]);
 
   // renderiza os participantes
   const content = () => {
@@ -54,7 +52,7 @@ const Content = ({ partyID }: {partyID: string}) => {
     <C.Container>
       <ContentHead />
       {
-        loading &&
+        loading || partyLoading &&
         <p>Aguarde estamos buscando seus convidados</p>
         ||
         content()
