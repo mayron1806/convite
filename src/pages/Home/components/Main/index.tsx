@@ -1,8 +1,28 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../../../Hooks/useAuth";
+import { getPartiesByUser } from "../../../../services/Party";
 import Party from "../../../../Types/Party"
+import Loading from "../../../../UI/Loading";
 import { dateFormated } from "../../../../Utils/Date";
 import * as C from './style';
-const Main = ({parties}: {parties: Party[]}) => {
+const Main = () => {
+  const { user } = useAuth();
+
+  // parties
+  const [parties, setParties] = useState<Party[]>([]);
+  const [loadingParties, setLoadingParties] = useState<boolean>(false);
+
+  useEffect(()=> {
+    if(user){
+      setLoadingParties(true);
+      getPartiesByUser(user.uid)
+      .then(res=> setParties(res))
+      .catch(e=> console.log(e))
+      .finally(()=> setLoadingParties(false))
+    }
+  }, [])
+   
   return(
     <C.Container>
       <C.Table>
@@ -13,11 +33,18 @@ const Main = ({parties}: {parties: Party[]}) => {
           </tr>
         </thead>
         <tbody>
-          {parties.map(party=> (
-            <PartyItem key={party.name} date={party.date} name={party.name}/>
-          ))}
+          {/*
+            !loadingParties &&
+            parties.map(party=> (
+              <PartyItem key={party.name} date={party.date} name={party.name}/>
+            ))*/
+          }
+          <td colSpan={2}>
+            <Loading />
+          </td>
         </tbody>
       </C.Table>
+      
     </C.Container>
   )
 }

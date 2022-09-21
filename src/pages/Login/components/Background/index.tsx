@@ -1,13 +1,7 @@
 import styled from "styled-components";
+import bg from '../../../../assets/imgs/party.png';
 
-export const Container = styled.div`
-  background-color: var(--black);
-  height: 100%;
-  gap: 5rem;
-  padding: 2rem;
-  display: flex;
-`;
-export const Background = styled.div`
+const Container = styled.div`
   position: absolute;
   top: 0;
   left: 0;
@@ -26,3 +20,11 @@ export const Background = styled.div`
     background: linear-gradient(180deg,transparent 10%,var(--black) 90%);
   }
 `;
+const Background = () => {
+  return(
+    <Container>
+      <img src={bg} alt="" />
+    </Container>
+  )
+}
+export default Background;
