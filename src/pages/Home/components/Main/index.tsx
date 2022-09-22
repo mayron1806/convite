@@ -1,9 +1,9 @@
+import { Unsubscribe } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../../../Hooks/useAuth";
 import { getPartiesByUser } from "../../../../services/Party";
 import Party from "../../../../Types/Party"
-import Loading from "../../../../UI/Loading";
 import { dateFormated } from "../../../../Utils/Date";
 import * as C from './style';
 const Main = () => {
@@ -14,13 +14,13 @@ const Main = () => {
   const [loadingParties, setLoadingParties] = useState<boolean>(false);
 
   useEffect(()=> {
+    let unsubscribe : Unsubscribe = () => {};
     if(user){
       setLoadingParties(true);
-      getPartiesByUser(user.uid)
-      .then(res=> setParties(res))
-      .catch(e=> console.log(e))
-      .finally(()=> setLoadingParties(false))
+      unsubscribe = getPartiesByUser(user.uid, (parties) => setParties(parties));
+      setLoadingParties(false);
     }
+    return () => unsubscribe();
   }, [])
    
   return(
@@ -33,15 +33,12 @@ const Main = () => {
           </tr>
         </thead>
         <tbody>
-          {/*
+          {
             !loadingParties &&
             parties.map(party=> (
               <PartyItem key={party.name} date={party.date} name={party.name}/>
-            ))*/
+            ))
           }
-          <td colSpan={2}>
-            <Loading />
-          </td>
         </tbody>
       </C.Table>
       

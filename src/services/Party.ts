@@ -1,32 +1,26 @@
-import { addDoc, collection, doc, getDoc, getDocs, query, Timestamp, where, limit } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, Timestamp, where, limit, onSnapshot } from "firebase/firestore";
 import { MAX_PARTY_NAME_SIZE, MIN_PARTY_NAME_SIZE } from "../config/Party";
 import Participant from "../Types/Participant";
 import Party from "../Types/Party";
 import {firestore as db} from "./firebase";
 
-export const getPartiesByUser = async (userID: string) => {
-  try{
-    const q = query(collection(db, 'parties'), where('ownerID', '==', userID));
-    const querySnapshot = await getDocs(q);
-    const parties: Party[] = [];
-    querySnapshot.forEach(doc => {
+export const getPartiesByUser = (userID: string, listenner: (parties: Party[]) => void) => {
+  const q = query(collection(db, 'parties'), where('ownerID', '==', userID));
+
+  return onSnapshot(q, (snapshot) => {
+    const parties = snapshot.docs.map(doc => {
       const timestamp = doc.data().date as Timestamp;
       const date = new Date(timestamp.toDate());
-
       const party: Party = {
         name : doc.data().name,
         date,
         ownerID: doc.data().ownerID,
         id: doc.id
       };
-      
-      parties.push(party);
+      return party;
     })
-    return parties; 
-  }
-  catch(e){
-    throw new Error((e as Error).message);
-  }
+    listenner(parties);
+  })
 }
 export const getPartyID = async (partyName: string, userID: string)=>{
   const q = query(

@@ -1,20 +1,26 @@
-import { async } from "@firebase/util";
-import { query, collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { query, collection, deleteDoc, doc, updateDoc, onSnapshot, addDoc } from "firebase/firestore";
 import Participant from "../Types/Participant";
 import { firestore as db } from "./firebase";
 
-export const GetParticipants = async (partyID: string) => {
-  try{
-    const q = query(collection(db, 'parties', partyID, 'participants'));
-    const participants = await getDocs(q);
-    return participants.docs.map(doc => {
-      const participant: Participant = {
+export const GetParticipants = (partyID: string, listenner: (Participants : Participant[]) => void) => {
+  const q = query(collection(db, 'parties', partyID, 'participants'));
+  return onSnapshot(q, (snapshot) => {
+    const participants = snapshot.docs.map(doc => {
+      const p: Participant = {
         name: doc.data().name,
         present: doc.data().present,
         id: doc.id
       };
-      return participant;
+      return p;
     })
+    console.log(participants);
+    
+    listenner(participants);
+  });
+}
+export const createParticipant = async (partyID: string, name: string) => {
+  try{
+    await addDoc(collection(db, 'parties', partyID, 'participants'), {name});
   }
   catch(e){
     throw new Error((e as Error).message);

@@ -8,6 +8,7 @@ export const ContentHead = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  margin-bottom: 1rem;
   .title{
     color: var(--purple);
     font-size: 2rem;

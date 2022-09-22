@@ -25,10 +25,12 @@ const More = ({participant, partyID}: props) => {
   const deleteParticipant = () => {
     DeleteParticipant(partyID, participant.id)
     .catch(e => console.log(e))
+    setActive(false);
   }
   const changePresent = (present: boolean) => {
     UpdateState(partyID, participant.id, present)
     .catch(e => console.log(e))
+    setActive(false);
   }
   return(
     <C.More>

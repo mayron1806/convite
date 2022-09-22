@@ -1,7 +1,6 @@
+import { Unsubscribe } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { IoIosAddCircleOutline } from 'react-icons/io';
-import { useParams } from 'react-router-dom';
-import useAuth from '../../../../Hooks/useAuth';
 import useParty from '../../../../Hooks/useParty';
 import { GetParticipants } from '../../../../services/Participants';
 import Participant from '../../../../Types/Participant';
@@ -9,10 +8,9 @@ import Button from '../../../../UI/Button';
 import ParticipantItem from '../ParticipantItem';
 import * as C from './style';
 
-const Content = () => {
+const Content = ({ openModal }:{openModal : () => void}) => {
   const { partyID, loading: partyLoading } = useParty();
-
-  const [loading, setLoading] = useState<boolean>(false);
+  const [participantLoading, setParticipantLoading] = useState<boolean>(false);
 
   const [participants, setParticipants] = useState<Participant[]>([]);
   const presentParticipants = participants.filter(p => p.present);
@@ -20,19 +18,17 @@ const Content = () => {
 
   // pega participantes da sala
   useEffect(()=> {
+    let unsubscribe : Unsubscribe = () => {};
     if(!partyLoading && partyID){
-      setLoading(true);
-      GetParticipants(partyID)
-      .then(res => {
-        setParticipants(res)
-      })
-      .catch(e=>console.log(e))
-      .finally(()=> setLoading(false));
+      setParticipantLoading(true);
+      unsubscribe = GetParticipants(partyID, (participants) => setParticipants(participants));
+      setParticipantLoading(false);
     }
-  }, [partyLoading, partyID]);
+    return () => unsubscribe();
+  }, [partyID, partyLoading]);
 
   // renderiza os participantes
-  const content = () => {
+  const renderContent = () => {
     const renderParticipant = (p: Participant) => (
       <ParticipantItem participant={p} key={p.id}/>
     )
@@ -50,22 +46,23 @@ const Content = () => {
   }
   return(
     <C.Container>
-      <ContentHead />
+      <ContentHead openModal={openModal}/>
       {
-        loading || partyLoading &&
+        participantLoading || partyLoading &&
         <p>Aguarde estamos buscando seus convidados</p>
         ||
-        content()
+        renderContent()
       }
     </C.Container>
   )
 }
-const ContentHead = ()=>{
+
+const ContentHead = ({ openModal }:{openModal : () => void}) =>{
   return(
       <C.ContentHead>
         <h2 className="title">Convidados</h2>
         <div>
-          <Button backgroundColor="purple">
+          <Button backgroundColor="purple" action={openModal}>
             <C.ButtonContent>
               Adicionar <IoIosAddCircleOutline />
             </C.ButtonContent>
