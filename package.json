@@ -9,12 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/dom-to-image": "^2.6.4",
+    "@types/md5": "^2.3.2",
     "@types/react-qr-reader": "^2.1.4",
     "@types/styled-components": "^5.1.26",
+    "dom-to-image": "^2.6.0",
     "firebase": "^9.9.4",
+    "md5": "^2.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
+    "react-qr-code": "^2.0.8",
     "react-qr-reader": "^3.0.0-beta-1",
     "react-router-dom": "^6.3.0",
     "styled-components": "^5.3.5"

@@ -5,26 +5,38 @@ import { DeleteParticipant, UpdateState } from "../../../../services/Participant
 import Participant from "../../../../Types/Participant";
 import Button from "../../../../UI/Button";
 import * as C from './style';
-
-const ParticipantItem = ({participant}: {participant: Participant}) => {
+type props = {
+  participant: Participant,
+  openQRCode: (participantID: Participant) => void
+}
+const ParticipantItem = ({participant, openQRCode}: props) => {
   const { partyID } = useParty();
   return(
     <C.Container>
       {participant.name}
-      <More participant={participant} partyID={partyID || ''}/>
+      <More 
+        participant={participant} 
+        partyID={partyID || ''} 
+        openQRCode={openQRCode} 
+      />
     </C.Container>
   );
 }
-type props = {
+type moreProps = {
   participant: Participant,
-  partyID: string
+  partyID: string,
+  openQRCode: (participant: Participant) => void
 }
-const More = ({participant, partyID}: props) => {
+const More = ({participant, partyID, openQRCode}: moreProps) => {
   const [active, setActive] = useState<boolean>(false);
 
   const deleteParticipant = () => {
     DeleteParticipant(partyID, participant.id)
     .catch(e => console.log(e))
+    setActive(false);
+  }
+  const openQRCodeModal = () => {
+    openQRCode(participant);
     setActive(false);
   }
   const changePresent = (present: boolean) => {
@@ -44,6 +56,7 @@ const More = ({participant, partyID}: props) => {
         </Button>
         <Button 
           backgroundColor="black" style={{color: 'var(--white)'}}
+          action={openQRCodeModal}
         >
           QR Code
         </Button>

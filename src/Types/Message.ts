@@ -1,6 +1,6 @@
-type messageTypes = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';
+export enum Stats {'ERROR' ,'SUCCESS' , 'LOADING', 'NONE'};
 type Message = {
   message: string,
-  stats: messageTypes
+  stats: Stats
 }
 export default Message;

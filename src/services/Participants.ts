@@ -1,4 +1,4 @@
-import { query, collection, deleteDoc, doc, updateDoc, onSnapshot, addDoc } from "firebase/firestore";
+import { query, collection, deleteDoc, doc, updateDoc, onSnapshot, addDoc, CollectionReference, DocumentData, getDoc } from "firebase/firestore";
 import Participant from "../Types/Participant";
 import { firestore as db } from "./firebase";
 
@@ -13,14 +13,25 @@ export const GetParticipants = (partyID: string, listenner: (Participants : Part
       };
       return p;
     })
-    console.log(participants);
-    
     listenner(participants);
   });
 }
 export const createParticipant = async (partyID: string, name: string) => {
   try{
-    await addDoc(collection(db, 'parties', partyID, 'participants'), {name});
+    const p = {
+      name: name
+    }
+    await addDoc(collection(db,'parties', partyID, 'participants'), p);
+  }
+  catch(e){
+    throw new Error((e as Error).message);
+  }
+}
+export const createParticipants = async (partyID: string, names: string[]) => {
+  try{
+    names.forEach(async name => {
+      await addDoc(collection(db,'parties', partyID, 'participants'), {name: name})
+    });
   }
   catch(e){
     throw new Error((e as Error).message);
@@ -37,6 +48,30 @@ export const UpdateState = async (partyID: string, participantID: string, presen
 export const DeleteParticipant = async (partyID: string, participantID: string) => {
   try{
     await deleteDoc(doc(db, 'parties', partyID, 'participants', participantID));
+  }
+  catch(e){
+    throw new Error((e as Error).message);
+  }
+}
+export const getParticipantCode = (partyID: string, participantID: string) => {
+  return (`${partyID}.${participantID}`);
+}
+export const validateParticipantCode = async (code:string) => {
+  try{
+    const [partyID, participantID] = code.split('.');
+    // valida se a sala existe
+    const party = await getDoc(doc(db,'parties', partyID));
+    if(!party.exists()) throw new Error('Participante invalido.');
+
+    // valida se o participante existe
+    const participantDoc = await getDoc(doc(db,'parties', partyID, 'participants', participantID));
+    if(!participantDoc.exists()) throw new Error('Participante invalido.');
+    
+    // valida se o participante já está presente
+    if(participantDoc.data().present) throw new Error('O participante ja está presente.');
+
+    // atualiza estado do participante
+    await UpdateState(partyID, participantID, true);
   }
   catch(e){
     throw new Error((e as Error).message);

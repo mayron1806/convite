@@ -24,7 +24,7 @@ const Title = styled.h2`
 type props = {
   children: JSX.Element,
   title?: string,
-  closeModal: ()=> void
+  closeModal: ()=> void,
 }
 const Modal = ({children, title, closeModal}: props) => {
   return(

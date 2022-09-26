@@ -6,9 +6,13 @@ import { GetParticipants } from '../../../../services/Participants';
 import Participant from '../../../../Types/Participant';
 import Button from '../../../../UI/Button';
 import ParticipantItem from '../ParticipantItem';
+import QRCodeParticipant from '../QRCodeParticipant';
 import * as C from './style';
-
-const Content = ({ openModal }:{openModal : () => void}) => {
+type props = {
+  openModal: () => void
+  enableScan: () => void
+}
+const Content = ({ openModal, enableScan }:props) => {
   const { partyID, loading: partyLoading } = useParty();
   const [participantLoading, setParticipantLoading] = useState<boolean>(false);
 
@@ -16,6 +20,17 @@ const Content = ({ openModal }:{openModal : () => void}) => {
   const presentParticipants = participants.filter(p => p.present);
   const absentParticipants = participants.filter(p => !p.present);
 
+  const [currentParticipant, setCurrentParticipant] = useState<Participant | null>(null);
+  const [QRCodeModalOpen, setQRCodeModalOpen] = useState<boolean>(false);
+  const openQRCodeModal = (participant: Participant) => {
+    setCurrentParticipant(participant);
+    setQRCodeModalOpen(true);
+  }
+  const closeQRCodeModal = () => {
+    setCurrentParticipant(null);
+    setQRCodeModalOpen(false);
+  }
+  
   // pega participantes da sala
   useEffect(()=> {
     let unsubscribe : Unsubscribe = () => {};
@@ -28,9 +43,9 @@ const Content = ({ openModal }:{openModal : () => void}) => {
   }, [partyID, partyLoading]);
 
   // renderiza os participantes
-  const renderContent = () => {
+  const renderParticipants = () => {
     const renderParticipant = (p: Participant) => (
-      <ParticipantItem participant={p} key={p.id}/>
+      <ParticipantItem participant={p} key={p.id} openQRCode={openQRCodeModal}/>
     )
     if(presentParticipants.length == 0){
       return absentParticipants.map(renderParticipant);
@@ -51,8 +66,15 @@ const Content = ({ openModal }:{openModal : () => void}) => {
         participantLoading || partyLoading &&
         <p>Aguarde estamos buscando seus convidados</p>
         ||
-        renderContent()
+        renderParticipants()
       }
+      {
+        QRCodeModalOpen && currentParticipant && partyID &&
+        <QRCodeParticipant closeModal={closeQRCodeModal} participant={currentParticipant} partyID={partyID}/>
+      }
+      <Button backgroundColor='purple' action={enableScan}>
+        Scanear QR Code
+      </Button>
     </C.Container>
   )
 }

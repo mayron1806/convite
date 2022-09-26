@@ -1,5 +1,4 @@
 import styled, { css, keyframes } from "styled-components";
-import Message from "../../../../Types/Message";
 
 export const Form = styled.form`
   display: flex;
@@ -26,42 +25,4 @@ export const Submit = styled.input.attrs({type: 'submit'})`
   &:hover{
     filter: brightness(1.5);
   }
-`;
-const dotAnim = keyframes`
-  0%{
-    content: '';
-  }
-  33%{
-    content: '.';
-  }
-  66%{
-    content: '..';
-  }
-  100%{
-    content: '...';
-  }
-`;
-const messageFormat = (message: Message) => {
-  switch(message.stats){
-    case 'ERROR':
-      return css`
-        color: var(--red);
-      `;
-    case 'SUCCESS':
-      return css`
-        color: var(--green);
-      `;
-    case 'LOADING':
-      return css`
-        color: var(--purple);
-        &::after{
-          content: '';
-          animation: ${dotAnim} 1s infinite;
-        }
-      `;
-  }
-}
-export const Message = styled.p<{message: Message}>`
-  font-size: 1.6rem;
-  ${props => messageFormat(props.message)}
 `;

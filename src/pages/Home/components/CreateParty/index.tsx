@@ -2,13 +2,10 @@ import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../../../Hooks/useAuth";
 import { createParty, partyValidation } from "../../../../services/Party";
+import Message, { Stats } from "../../../../Types/Message";
+import Feedback from "../../../../UI/Feedback";
 import Modal from "../../../../UI/Modal";
 import * as C from "./style";
-export type messageTypes = 'ERROR' | 'SUCCESS' | 'LOADING' | 'NONE';
-type message = {
-  message: string,
-  stats: messageTypes
-}
 type props = {
   closeModal: ()=> void
 }
@@ -16,7 +13,7 @@ const CreateParty = ({ closeModal }: props) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [status, setStatus] = useState<message>({message: '', stats: "NONE"});
+  const [message, setMessage] = useState<Message>({message: '', stats: Stats.NONE});
   
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -27,21 +24,21 @@ const CreateParty = ({ closeModal }: props) => {
     const date = new Date(data.get('date') as string);
     date.setHours(date.getHours() + (date.getTimezoneOffset() / 60));
 
-    setStatus({stats: 'LOADING', message: 'Validando'});
+    setMessage({stats: Stats.LOADING, message: 'Validando'});
     partyValidation(name, date, user.uid)
     .then(() => {
-      setStatus({stats: 'LOADING', message: 'Criando festa'});
+      setMessage({stats: Stats.LOADING, message: 'Criando festa'});
       // cria festa
       createParty(name, date, user.uid, [])
       .then(()=> {
-        setStatus({stats: 'SUCCESS', message: 'Festa criada com sucesso!'});
+        setMessage({stats: Stats.SUCCESS, message: 'Festa criada com sucesso!'});
       })
       .catch(e => {
-        setStatus({message: (e as Error).message, stats: "ERROR"});
+        setMessage({message: (e as Error).message, stats: Stats.ERROR});
       })
     })
     .catch(e => {
-      setStatus({message: (e as Error).message, stats: "ERROR"});
+      setMessage({message: (e as Error).message, stats: Stats.ERROR});
     })
   }
   return(
@@ -57,10 +54,7 @@ const CreateParty = ({ closeModal }: props) => {
           placeholder="Data da festa" 
           name='date'
         />
-        {
-          status.message.length > 0 && status.stats !== 'NONE' &&
-          <C.Message stats={status.stats}>{status.message}</C.Message>
-        }
+        <Feedback message={message}/>
         <C.Submit value="Criar" />
       </C.Form>
     </Modal>
