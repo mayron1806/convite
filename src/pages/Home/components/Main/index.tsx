@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../../../Hooks/useAuth";
 import { getPartiesByUser } from "../../../../services/Party";
 import Party from "../../../../Types/Party"
+import Loading from "../../../../UI/Loading";
 import { dateFormated } from "../../../../Utils/Date";
 import * as C from './style';
 const Main = () => {
@@ -41,7 +42,10 @@ const Main = () => {
           }
         </tbody>
       </C.Table>
-      
+      {
+        loadingParties &&
+        <Loading text="Carregando festas" />
+      }
     </C.Container>
   )
 }

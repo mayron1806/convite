@@ -4,7 +4,11 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: var(--white);
   width: 100%;
+  svg{
+    font-size: 4rem;
+  }
 `;
 const rotateAnim = keyframes`
   from{
@@ -15,23 +19,12 @@ const rotateAnim = keyframes`
   }
 `;
 export const Circle = styled.span`
-  width: 6rem;
-  height: 6rem;
-  border: 5px solid var(--purple);
-  border-radius: 50%;
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: ${rotateAnim} 1s infinite linear;
-  ::before{
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-left: 5rem solid transparent;
-    border-right: 5rem solid transparent;
-    border-top: 4rem solid var(--black);
-    overflow: hidden;
-  }
 `;
 export const Text = styled.p`
-
+  font-size: 1.6rem;
+  text-align: center;
 `;

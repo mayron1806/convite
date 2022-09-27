@@ -1,6 +1,6 @@
 import useAuth from "../../Hooks/useAuth";
 import Button from "../Button";
-import {ImExit} from 'react-icons/im';
+import {IoExitOutline} from 'react-icons/io5';
 import { useNavigate } from "react-router-dom";
 import * as C from "./style";
 const Footer = () => {
@@ -19,8 +19,8 @@ const Footer = () => {
           {user?.displayName} 
         </C.UserName>
       </C.UserInfo>
-        <Button backgroundColor="black" action={exit} style={{width:'fit-content'}}>
-          <ImExit fontSize='2rem'/>
+        <Button backgroundColor="black" action={exit} style={{width:'fit-content', color: 'var(--white)'}}>
+          <IoExitOutline fontSize='2.5rem'/>
         </Button>
     </C.Container>
   )

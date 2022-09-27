@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const Container = styled.button<{backgroundColor?: 'white' | 'black' | 'purple'}>`
+const Container = styled.button<{backgroundColor?: 'white' | 'black' | 'purple' | 'red'}>`
   padding: 0.5rem 1rem;
   background-color: var(--${props => props.backgroundColor ? props.backgroundColor : 'white'});
   display: flex;
@@ -14,7 +14,7 @@ const Container = styled.button<{backgroundColor?: 'white' | 'black' | 'purple'}
 type props = {
   children: JSX.Element[] | JSX.Element | string,
   action?: () => void,
-  backgroundColor?: 'white' | 'black' | 'purple',
+  backgroundColor?: 'white' | 'black' | 'purple' | 'red',
   style?: React.CSSProperties
 }
 const Button = ({children, action, backgroundColor, style}: props) => {

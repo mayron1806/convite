@@ -49,22 +49,22 @@ const More = ({participant, partyID, openQRCode}: moreProps) => {
       <BsThreeDotsVertical onClick={()=> setActive(a => !a)}/>
       <C.Options isActive={active}>
         <Button 
-          backgroundColor="black" style={{color: 'var(--white)'}}
+          backgroundColor="black"
           action={()=> changePresent(!participant.present)}
         >
-          {participant.present ? 'Desmarcar presença' : 'Marcar presença'}
+          <C.ButtonContent>{participant.present ? 'Desmarcar presença' : 'Marcar presença'}</C.ButtonContent>
         </Button>
         <Button 
-          backgroundColor="black" style={{color: 'var(--white)'}}
+          backgroundColor="black"
           action={openQRCodeModal}
         >
-          QR Code
+          <C.ButtonContent>QR Code</C.ButtonContent>
         </Button>
         <Button 
-          style={{color: 'var(--white)', backgroundColor: 'var(--red)'}}
+          backgroundColor="red"
           action={deleteParticipant}
         >
-          Excluir
+          <C.ButtonContent>Excluir</C.ButtonContent>
         </Button>
       </C.Options>
     </C.More>

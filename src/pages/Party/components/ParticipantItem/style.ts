@@ -38,8 +38,14 @@ export const Options = styled.div<{isActive: boolean}>`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-
   transition: 0.5s;
   pointer-events: ${props => props.isActive ? 'all' : 'none'};
   opacity:${props => props.isActive ? 1 : 0};
+`;
+export const ButtonContent = styled.p`
+  font-size: 1.6rem;
+  width: 100%;
+  padding: 1rem;
+  white-space: nowrap;
+  color: var(--white);
 `;

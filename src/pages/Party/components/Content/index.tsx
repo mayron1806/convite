@@ -5,6 +5,7 @@ import useParty from '../../../../Hooks/useParty';
 import { GetParticipants } from '../../../../services/Participants';
 import Participant from '../../../../Types/Participant';
 import Button from '../../../../UI/Button';
+import Loading from '../../../../UI/Loading';
 import ParticipantItem from '../ParticipantItem';
 import QRCodeParticipant from '../QRCodeParticipant';
 import * as C from './style';
@@ -51,29 +52,31 @@ const Content = ({ openModal, enableScan }:props) => {
       return absentParticipants.map(renderParticipant);
     }
     return (
-      <>
+      <div>
         <C.SubTitle>A chegar</C.SubTitle>
         { absentParticipants.map(renderParticipant) }
-        <C.SubTitle>Presentes</C.SubTitle>
+        <C.SubTitle style={{marginTop: '1rem'}}>Presentes</C.SubTitle>
         { presentParticipants.map(renderParticipant) }
-      </>
+      </div>
     )
   }
   return(
     <C.Container>
       <ContentHead openModal={openModal}/>
-      {
-        participantLoading || partyLoading &&
-        <p>Aguarde estamos buscando seus convidados</p>
-        ||
-        renderParticipants()
-      }
+      <C.Participants>
+        {
+          participantLoading || partyLoading &&
+          <Loading text='Aguarde estamos buscando seus convidados.' />
+          ||
+            renderParticipants()
+        }
+      </C.Participants>
       {
         QRCodeModalOpen && currentParticipant && partyID &&
         <QRCodeParticipant closeModal={closeQRCodeModal} participant={currentParticipant} partyID={partyID}/>
       }
       <Button backgroundColor='purple' action={enableScan}>
-        Scanear QR Code
+        <C.ButtonContent>Scanear QR Code</C.ButtonContent>
       </Button>
     </C.Container>
   )

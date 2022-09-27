@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import PageProtector from "./pages/PageProtector";
 import Party from "./pages/Party";
+import Loading from "./UI/Loading";
 function App() {
   const { fetchingUser } = useAuth();
   return (
@@ -18,7 +19,9 @@ function App() {
           </Routes>
         </BrowserRouter>
         ||
-        <p>Carregando...</p>
+        <div style={{width: '100%', height: '100%', background: 'var(--black)'}}>
+          <Loading text="Carregando..."/>
+        </div>
       }
     </div>
   );
