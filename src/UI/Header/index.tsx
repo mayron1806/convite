@@ -10,7 +10,7 @@ const Container = styled.div`
   background-color: var(--black);
   padding: 1rem;
   box-shadow: var(--shadow);
-  margin-bottom: 1.5rem;
+  z-index: 100;
 `;
 const Content = styled.div`
   display: flex;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AiOutlineClose } from 'react-icons/ai';
+import {IoIosCloseCircleOutline} from 'react-icons/io';
 import {QrReader} from 'react-qr-reader';
 import { validateParticipantCode } from '../../services/Participants';
 import Message, { Stats } from '../../Types/Message';
@@ -7,21 +7,23 @@ import Button from '../../UI/Button';
 import Header from '../../UI/Header';
 import Feedback from '../../UI/Feedback';
 import * as C from './style';
+import Scan from './components/Scan';
+import Result from './components/Result';
 type props = {
   disableScan: () => void
 }
 const Scanner = ({ disableScan }: props) => {
-  const [code, setCode] = useState<string>('');
   const [scanComplete, setScanComplete] = useState<boolean>(false);
   const [message, setMessage] = useState<Message>({message: '', stats: Stats.NONE});
 
-  const validate = () => {
+  const validateCode = (code: string) => {
     setMessage({message: 'Buscando participante', stats: Stats.LOADING});
-    validateParticipantCode(code)
+    validateParticipantCode(code, 'a')
     .then(() => {
       setMessage({message: 'Tudo certo por aqui!', stats: Stats.SUCCESS});
     })
     .catch(e => {
+      console.log(e);
       setMessage({message: (e as Error).message, stats: Stats.ERROR});
     })
   }
@@ -34,29 +36,15 @@ const Scanner = ({ disableScan }: props) => {
           backgroundColor="black"
           style={{width: 'fit-content'}}
         >
-          <AiOutlineClose fontSize='2rem'/>
+          <C.Close><IoIosCloseCircleOutline /></C.Close>
         </Button>
       </Header>
       {
-        scanComplete &&
-        <QrReader 
-          onResult={(result, error)=> {
-            if (result) {
-              setCode(result.getText());
-              setScanComplete(true);
-            }
-            if (error) {
-              console.log(error);  
-            }
-          }}
-          constraints={{facingMode: 'environment'}}
-        />
+        !scanComplete &&
+          <Scan setScanComplete={setScanComplete} validateCode={validateCode} disableScan={disableScan}/>
         || 
-        <C.Fetching stats={message.stats}>
-          <Feedback message={message}/>
-        </C.Fetching>
-      }
-      <p>{code}</p> 
+          <Result message={message} resetScanner={() => setScanComplete(false)} />
+        }
     </C.Container>
   )
 }

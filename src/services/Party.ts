@@ -89,3 +89,11 @@ export const partyValidation = async (name: string, date: Date, ownerID: string)
     throw new Error("O nome já está em uso.");
   }
 } 
+export const deleteParty = async(partyID: string) => {
+  try{
+    
+  }
+  catch(e){
+
+  }
+}

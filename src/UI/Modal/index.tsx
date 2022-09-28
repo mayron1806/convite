@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import Button from "../Button";
-import {AiOutlineClose} from 'react-icons/ai';
+import {IoIosCloseCircleOutline} from 'react-icons/io';
 const Container = styled.div`
   position: absolute;
   top: 50%;
@@ -15,11 +15,19 @@ const Head = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 2rem;
+  color: var(--white);
 `;
 const Title = styled.h2`
   font-weight: 500;
   font-size: 2rem;
   color: var(--white);
+  white-space: nowrap;
+`;
+const ButtonContent = styled.div`
+  color: var(--white);
+  font-size: 2.5rem;
 `;
 type props = {
   children: JSX.Element,
@@ -36,7 +44,7 @@ const Modal = ({children, title, closeModal}: props) => {
           backgroundColor="black"
           style={{width: 'fit-content'}}
         >
-          <AiOutlineClose fontSize='2rem'/>
+          <ButtonContent><IoIosCloseCircleOutline /></ButtonContent>
         </Button>
       </Head>
       {children}
